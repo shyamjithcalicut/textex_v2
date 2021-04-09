@@ -1,0 +1,2 @@
+# textex_v2
+TexTex app allows you to open chat with anyone on WhatsApp/SMS without save his/her number on your phone, as we all know that we can't open chat with someone without save the number on your contact but with TexTex you can do it with easiest way just by writing the number of your friend or anyone you want and click open chat and a conversation with the number you wrote will appear and you can send message
