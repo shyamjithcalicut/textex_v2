@@ -3,6 +3,8 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:call_log/call_log.dart';
 import 'callLogs.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class PhonelogsScreen extends StatefulWidget {
   @override
@@ -68,7 +70,7 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
                         return GestureDetector(
                           child: Card(
                             child: Dismissible(
-                                key: Key(index.toString()),
+                                key: UniqueKey(),
                                 onDismissed: (direction) async {
                                   String phoneval = entries
                                       .elementAt(index)
@@ -112,6 +114,15 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
                                       color: Colors.white,
                                     )),
                                 child: ListTile(
+                                  onLongPress: () {
+                                    Clipboard.setData(new ClipboardData(
+                                        text: entries.elementAt(index).number));
+                                    Fluttertoast.showToast(
+                                        msg: "Number Copied to Clipboard",
+                                        toastLength: Toast.LENGTH_SHORT,
+                                        gravity: ToastGravity.CENTER,
+                                        timeInSecForIosWeb: 1);
+                                  },
                                   leading: cl.getAvator(
                                       entries.elementAt(index).callType,
                                       cl.getFirstLetter(
