@@ -1,46 +1,73 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import './phonelogs_screen.dart';
 import 'package:package_info/package_info.dart';
+import './theme_provider.dart';
+import 'package:provider/provider.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+
+import 'Calllogentry.dart';
+
+//import 'package:flutter/scheduler.dart';
 
 void main() {
   // SystemChrome.setPreferredOrientations([
   //   DeviceOrientation.portraitUp,
   // ]);
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    systemNavigationBarColor: Colors.white, // navigation bar color
-    statusBarColor: Colors.white, // status bar color,
-    systemNavigationBarDividerColor: Colors.white,
-    //navigation bar icon
-  ));
+
+  // if (darkModeOn) {
+  //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //     systemNavigationBarColor: Colors.grey.shade800, // navigation bar color
+  //     statusBarColor: Colors.grey.shade800, // status bar color,
+  //     systemNavigationBarDividerColor: Colors.grey.shade800,
+  //     //navigation bar icon
+  //   ));
+  // } else {
+  //   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //     systemNavigationBarColor: Colors.white, // navigation bar color
+  //     statusBarColor: Colors.white, // status bar color,
+  //     systemNavigationBarDividerColor: Colors.white,
+  //     //navigation bar icon
+  //   ));
+  //}
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'TexTex',
-      themeMode: ThemeMode.system,
-      theme: ThemeData(
-          primaryColor: Colors.white,
-          accentColor: Colors.white,
-          canvasColor: Colors.white,
-          backgroundColor: Colors.white,
-          accentColorBrightness: Brightness.light,
-          textTheme: GoogleFonts.archivoTextTheme(
-            Theme.of(context).textTheme,
-          ),
-          brightness: Brightness.light),
-      home: MyHomePage(title: 'TexTex'),
-    );
-  }
+  Widget build(BuildContext context) => ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      builder: (context, _) {
+        final themeprovider = Provider.of<ThemeProvider>(context);
+
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: 'TexTex',
+          themeMode: themeprovider.themeMode,
+          theme: AppThemes.lightTheme,
+          darkTheme: AppThemes.darkTheme,
+
+          // theme: ThemeData(
+          //     primaryColor: Colors.white,
+          //     accentColor: Colors.white,
+          //     canvasColor: Colors.white,
+          //     backgroundColor: Colors.white,
+          //     accentColorBrightness: Brightness.light,
+          //     textTheme: GoogleFonts.archivoTextTheme(
+          //       Theme.of(context).textTheme,
+          //     ),
+          //     brightness: Brightness.light),
+          home: MyHomePage(title: 'TexTex'),
+        );
+      });
 }
 
 class MyHomePage extends StatefulWidget {
@@ -89,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                             child: CircleAvatar(
                               maxRadius: 30,
                               foregroundColor: Colors.green,
-                              backgroundColor: Colors.white,
+                              backgroundColor: Colors.transparent,
                               child: Transform.rotate(
                                   angle: 45 * 3.14 / 90,
                                   child: IconButton(
@@ -189,81 +216,6 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         })
                   ]),
                 )),
-                Container(
-                  width: (MediaQuery.of(context).size.width),
-                  height: 90,
-                  alignment: Alignment.center,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                            width: 130,
-                            height: 42,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                primary: Colors.blue,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                    color: Colors.blue,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              onPressed: () async {
-                                var cofeeurl =
-                                    "https://www.buymeacoffee.com/Shyamjit";
-                                await launch(cofeeurl);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  FaIcon(FontAwesomeIcons.coffee),
-                                  Padding(
-                                      padding:
-                                          EdgeInsetsDirectional.only(start: 8)),
-                                  Text(
-                                    "Buy Me a Coffee",
-                                    style: TextStyle(
-                                      fontSize: 10,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            )),
-                        Container(
-                          width: 30,
-                          height: 50,
-                        ),
-                        Container(
-                            width: 130,
-                            height: 50,
-                            alignment: Alignment.center,
-                            child: TextButton(
-                              style: TextButton.styleFrom(
-                                primary: Colors.green,
-                                shape: RoundedRectangleBorder(
-                                  side: BorderSide(
-                                    color: Colors.green,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              onPressed: () {},
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.share),
-                                  Padding(
-                                      padding: EdgeInsetsDirectional.only(
-                                          start: 10)),
-                                  Text("Share")
-                                ],
-                              ),
-                            )),
-                      ]),
-                ),
               ],
             ),
           );
@@ -272,14 +224,18 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
 
   AnimationController _animatedIconController;
   bool isMenuOpen = false;
-
+  List<CallLogEntry> callLogs = List<CallLogEntry>();
   Offset _offset = Offset(0, 0);
   String versionName = "";
   String versionCode = "";
+  bool darkModeOn = false;
+  SharedPreferences sharedPreferences;
+  PhonelogsScreen phonelogsScreen = PhonelogsScreen();
 
   @override
   void initState() {
     super.initState();
+    initializedSharedPrefs();
     getversionNumber();
     _animatedIconController = AnimationController(
       vsync: this,
@@ -288,8 +244,31 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     );
   }
 
+  void initializedSharedPrefs() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    getContacts();
+  }
+
   getsize(int x) {
     return 18.0;
+  }
+
+  void saveNumber() {
+    List<String> spList =
+        callLogs.map((item) => json.encode(item.toMap())).toList();
+    sharedPreferences.setStringList('contactList', spList);
+    setState(() {
+      phonelogsScreen.createState();
+    });
+  }
+
+  void getContacts() {
+    List<String> spList = sharedPreferences.getStringList('contactList');
+    if (spList != null) {
+      callLogs =
+          spList.map((item) => CallLogEntry.fromMap(jsonDecode(item))).toList();
+      setState(() {});
+    }
   }
 
   getversionNumber() async {
@@ -303,10 +282,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     Size mediaQuery = MediaQuery.of(context).size;
     double sizebarSize = mediaQuery.width;
     double menuContainerHeight = mediaQuery.height / 1.5;
+    final themeprovider = Provider.of<ThemeProvider>(context);
+    darkModeOn = themeprovider.isDarkMode;
     return SafeArea(
       child: Scaffold(
           appBar: AppBar(
-            // backgroundColor: Colors.white,
+            brightness: darkModeOn ? Brightness.dark : Brightness.light,
+
+            systemOverlayStyle: SystemUiOverlayStyle(
+                statusBarColor: darkModeOn ? Colors.black : Colors.white,
+                statusBarBrightness:
+                    darkModeOn ? Brightness.dark : Brightness.light),
             title: Text(
               "TexTex",
               style: GoogleFonts.abel(
@@ -324,6 +310,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               color: Colors.green,
               iconSize: 30,
               onPressed: () {
+                FocusManager.instance.primaryFocus.unfocus();
                 setState(() {
                   isMenuOpen
                       ? _animatedIconController.reverse()
@@ -353,6 +340,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                       Flexible(
                         child: TextField(
                           keyboardType: TextInputType.phone,
+                          cursorColor: Colors.green,
                           onChanged: (String number) {
                             setState(() {
                               String phoneval =
@@ -367,6 +355,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                           },
                           decoration: InputDecoration(
                               hoverColor: Colors.green,
+                              focusColor: Colors.green,
                               hintText: "Phone Number",
                               prefixIcon: Padding(
                                 padding:
@@ -405,6 +394,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     timeInSecForIosWeb: 1);
                                 return;
                               }
+                              CallLogEntry entry = CallLogEntry.addItem(
+                                  DateTime.now().millisecondsSinceEpoch,
+                                  phoneNumber);
+                              // var item = callLogs.firstWhere(
+                              //     (element) => element.number == phoneNumber);
+                              // if (item != null) {
+                              //   callLogs.remove(item);
+                              // }
+                              callLogs.add(entry);
+                              saveNumber();
+
                               var smsUrl = "sms:$phoneNumber";
                               await launch(smsUrl);
                             },
@@ -447,6 +447,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     timeInSecForIosWeb: 1);
                                 return;
                               }
+                              CallLogEntry entry = CallLogEntry.addItem(
+                                  DateTime.now().millisecondsSinceEpoch,
+                                  phoneNumber);
+
+                              // var item = callLogs.firstWhere(
+                              //     (element) => element.number == phoneNumber);
+                              // if (item != null) {
+                              //   callLogs.remove(item);
+                              // }
+
+                              callLogs.add(entry);
+
+                              saveNumber();
                               var whatsappUrl =
                                   "whatsapp://send?phone=$phoneNumber";
                               await launch(whatsappUrl);
@@ -465,7 +478,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                     ]),
                   ),
                   Container(
-                    child: PhonelogsScreen(),
+                    child: phonelogsScreen,
                   )
                 ]),
               ),
@@ -506,7 +519,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                         Container(
                           height: mediaQuery.height,
                           width: sizebarSize,
-                          color: Colors.white,
+                          color:
+                              darkModeOn ? Colors.grey.shade800 : Colors.white,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             mainAxisSize: MainAxisSize.max,
@@ -520,8 +534,8 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                     Container(
                                       child: CircleAvatar(
                                         maxRadius: 38,
-                                        foregroundColor: Colors.green,
-                                        backgroundColor: Colors.white,
+                                        //foregroundColor: Colors.green,
+                                        backgroundColor: Colors.transparent,
                                         child: Transform.rotate(
                                             angle: 45 * 3.14 / 90,
                                             child: IconButton(
@@ -578,6 +592,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       height: menuContainerHeight / 10,
                                       iconData: Icons.verified_user,
                                       textSize: getsize(1),
+                                      onPressCallback: () async {
+                                        var privacypolicyURL =
+                                            "https://shyamjithcherukara.wordpress.com/textex-privacy-policy/";
+                                        await launch(privacypolicyURL);
+                                      },
                                     ),
                                     Divider(
                                       thickness: 1,
@@ -587,16 +606,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       height: menuContainerHeight / 10,
                                       iconData: Icons.help,
                                       textSize: getsize(2),
-                                    ),
-                                    Divider(
-                                      thickness: 1,
-                                    ),
-                                    MenuButton(
-                                      text: "Buy Me A Coffee",
-                                      height: menuContainerHeight / 10,
-                                      iconData:
-                                          FaIcon(FontAwesomeIcons.coffee).icon,
-                                      textSize: getsize(3),
+                                      onPressCallback: () async {
+                                        var helpURL =
+                                            "https://shyamjithcherukara.wordpress.com/textex-help/";
+                                        await launch(helpURL);
+                                      },
                                     ),
                                     Divider(
                                       thickness: 1,
@@ -606,6 +620,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       height: menuContainerHeight / 10,
                                       iconData: Icons.share,
                                       textSize: getsize(4),
+                                      onPressCallback: () {},
                                     ),
                                     Divider(
                                       thickness: 1,
@@ -652,19 +667,19 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                               Text(
                                                 "Shyamjith Cherukara",
                                                 style: TextStyle(
-                                                    color: Colors.black45,
+                                                    //color: Colors.black45,
                                                     fontSize: 18),
                                               ),
                                               Text(
                                                 "shyamjith.calicut@gmail.com",
                                                 style: TextStyle(
-                                                    color: Colors.black45,
+                                                    //color: Colors.black45,
                                                     fontSize: 10),
                                               ),
                                               Text(
                                                 "+91 9744473479",
                                                 style: TextStyle(
-                                                    color: Colors.black45,
+                                                    // color: Colors.black45,
                                                     fontSize: 10),
                                               ),
                                             ],
@@ -703,7 +718,17 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
             ]),
           ),
           floatingActionButton: FloatingActionButton(
-              onPressed: () {},
+              onPressed: () {
+                final assetsAudioPlayer = AssetsAudioPlayer();
+
+                assetsAudioPlayer.open(
+                  Audio("assets/sounds/intuition-561.mp3"),
+                );
+                HapticFeedback.heavyImpact();
+                final provider =
+                    Provider.of<ThemeProvider>(context, listen: false);
+                provider.toggleTheme(!provider.isDarkMode);
+              },
               tooltip: 'Change Theme',
               child: FaIcon(FontAwesomeIcons.lightbulb),
               //backgroundColor: Colors.white,

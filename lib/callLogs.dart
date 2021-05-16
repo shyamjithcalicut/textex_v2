@@ -1,11 +1,29 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:call_log/call_log.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
+import './Calllogentry.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CallLogs {
-  Future<Iterable<CallLogEntry>> getCallLogs() {
-    return CallLog.get();
+  SharedPreferences sharedPreferences;
+
+  Future<List<CallLogEntry>> getCallLogs() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    return getContacts();
+  }
+
+  List<CallLogEntry> getContacts() {
+    List<String> spList = sharedPreferences.getStringList('contactList');
+    List<CallLogEntry> callLogs = List<CallLogEntry>();
+    if (spList != null) {
+      callLogs =
+          spList.map((item) => CallLogEntry.fromMap(jsonDecode(item))).toList();
+      callLogs.sort((b, a) => a.timeStamp.compareTo(b.timeStamp));
+    }
+
+    return callLogs;
   }
 
   void call(String text) async {
@@ -19,15 +37,15 @@ class CallLogs {
     await launch(whatsappUrl);
   }
 
-  getAvator(CallType callType, String firstLetter) {
+  getAvator(String firstLetter) {
     return Container(
       child: CircleAvatar(
         maxRadius: 30,
-        foregroundColor: Colors.green,
-        backgroundColor: Colors.white,
+        //foregroundColor: Colors.green,
+        backgroundColor: Colors.transparent,
         child: Text(
           firstLetter,
-          style: TextStyle(fontSize: 32),
+          style: TextStyle(fontSize: 32, color: Colors.green),
         ),
       ),
       decoration: new BoxDecoration(
@@ -41,7 +59,7 @@ class CallLogs {
   }
 
   String formatDate(DateTime dt) {
-    return DateFormat('dd/MM/yyy H:m:s').format(dt);
+    return DateFormat('dd/MM/yyy hh:mm:ss a').format(dt);
   }
 
   getTitle(CallLogEntry entry) {
@@ -61,19 +79,23 @@ class CallLogs {
   }
 
   String getTime(int duration) {
-    Duration d1 = Duration(seconds: duration);
-    String formatedDuration = "";
-    if (d1.inHours > 0) {
-      formatedDuration += d1.inHours.toString() + "h ";
+    if (duration != null) {
+      Duration d1 = Duration(seconds: duration);
+      String formatedDuration = "";
+      if (d1.inHours > 0) {
+        formatedDuration += d1.inHours.toString() + "h ";
+      }
+      if (d1.inMinutes > 0) {
+        formatedDuration += d1.inMinutes.toString() + "m ";
+      }
+      if (d1.inSeconds > 0) {
+        formatedDuration += d1.inSeconds.toString() + "s";
+      }
+      if (formatedDuration.isEmpty) return "0s";
+      return formatedDuration;
+    } else {
+      return "";
     }
-    if (d1.inMinutes > 0) {
-      formatedDuration += d1.inMinutes.toString() + "m ";
-    }
-    if (d1.inSeconds > 0) {
-      formatedDuration += d1.inSeconds.toString() + "s";
-    }
-    if (formatedDuration.isEmpty) return "0s";
-    return formatedDuration;
   }
 }
 

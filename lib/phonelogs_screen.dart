@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:call_log/call_log.dart';
 import 'callLogs.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import './Calllogentry.dart';
 
 class PhonelogsScreen extends StatefulWidget {
   @override
@@ -18,7 +19,7 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
   DateTime now = DateTime.now();
 
   AppLifecycleState _notification;
-  Future<Iterable<CallLogEntry>> logs;
+  Future<List<CallLogEntry>> logs;
 
   @override
   void initState() {
@@ -45,11 +46,19 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
       final difference = today.difference(now).inSeconds;
       if (difference > 5) {
         setState(() {
+          logs = null;
           logs = cl.getCallLogs();
           now = DateTime.now();
         });
       }
     }
+  }
+
+  void refreshCallLogs() {
+    setState(() {
+      logs = cl.getCallLogs();
+      now = DateTime.now();
+    });
   }
 
   @override
@@ -72,6 +81,12 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
                             child: Dismissible(
                                 key: UniqueKey(),
                                 onDismissed: (direction) async {
+                                  HapticFeedback.heavyImpact();
+                                  final assetsAudioPlayer = AssetsAudioPlayer();
+
+                                  assetsAudioPlayer.open(
+                                    Audio("assets/sounds/chime-351.mp3"),
+                                  );
                                   String phoneval = entries
                                       .elementAt(index)
                                       .number
@@ -123,14 +138,18 @@ class _PhonelogsScreenState extends State<PhonelogsScreen>
                                         gravity: ToastGravity.CENTER,
                                         timeInSecForIosWeb: 1);
                                   },
-                                  leading: cl.getAvator(
-                                      entries.elementAt(index).callType,
-                                      cl.getFirstLetter(
-                                          entries.elementAt(index))),
+                                  leading: cl.getAvator(cl.getFirstLetter(
+                                      entries.elementAt(index))),
                                   title: cl.getTitle(entries.elementAt(index)),
                                   subtitle: Text(cl.formatDate(
                                       new DateTime.fromMillisecondsSinceEpoch(
-                                          entries.elementAt(index).timestamp))),
+                                          (entries.elementAt(index).timeStamp !=
+                                                  null
+                                              ? entries
+                                                  .elementAt(index)
+                                                  .timeStamp
+                                              : DateTime.now()
+                                                  .millisecondsSinceEpoch)))),
                                   isThreeLine: false,
                                   trailing: Wrap(children: <Widget>[
                                     IconButton(
