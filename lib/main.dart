@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -275,6 +276,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     versionName = "v" + packageInfo.version;
     versionCode = packageInfo.buildNumber;
+  }
+
+  Future<void> share(dynamic link, String title) async {
+    await FlutterShare.share(
+        title: title,
+        text: title,
+        linkUrl: link,
+        chooserTitle: "Where do you want to Share ?");
   }
 
   @override
@@ -620,7 +629,11 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
                                       height: menuContainerHeight / 10,
                                       iconData: Icons.share,
                                       textSize: getsize(4),
-                                      onPressCallback: () {},
+                                      onPressCallback: () async {
+                                        await share(
+                                            "https://play.google.com/store/apps/details?id=com.u4codesystem.textex",
+                                            "Hey, Do you need to send a Whatsapp Message without Saving number to Contacts? Check this out ");
+                                      },
                                     ),
                                     Divider(
                                       thickness: 1,
